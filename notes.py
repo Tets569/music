@@ -1,6 +1,5 @@
-
-
-
+from enum import Enum, IntEnum
+from abc import ABC, abstractmethod
 
 
 
@@ -50,13 +49,14 @@
 	C-maj7 doesn't have as much tension as 7, soooo
 	G7 brings back to C more
 '''
-KEYS = ['C', 'C+', ...]
-KEYS = ['C', 'B-', ...]
+
+# KEYS = ['C', 'C+', ...]
+# KEYS = ['C', 'B-', ...]
 
 
-class Chord:  # but, can be a diff chord in diff key... D: D: D:
-	def __init__(self, key, notes):
-		pass
+# class Chord:  # but, can be a diff chord in diff key... D: D: D:
+# 	def __init__(self, key, notes):
+# 		pass
 
 
 
@@ -183,23 +183,25 @@ Repositories
 
 '''
 	Name 	Notes in C Major Scale 	Semi-tones from fundamental
-C "Major Triad" 	C-E-G 	0-4-7
-Cm "Minor Triad" 	C-Eb-G 	0-3-7
-Cdim "Diminished" 	C-Eb-Gb 	0-3-6
-C+ "Augmented" 	C-E-G# 	0-4-8
-Csus "Sustained" 	C-F-G 	0-5-7
-C6 "Sixth" 	C-E-G-A 	0-4-7-9
-Cm6 "Minor Sixth" 	C-Eb-G-A 	0-3-7-9
-C7 "Dominant Seventh" 	C-E-G-Bb 	0-4-7-10
-Cmaj7 "Major Seventh" 	C-E-G-B 	0-4-7-11
+C "Major Triad" 	C-E-G 					0-4-7
+Cm "Minor Triad" 	C-Eb-G 					0-3-7
+Cdim "Diminished" 	C-Eb-Gb 				0-3-6
+C+ "Augmented" 	C-E-G# 						0-4-8
+Csus "Sustained" 	C-F-G 					0-5-7
+C6 "Sixth" 	C-E-G-A 						0-4-7-9
+Cm6 "Minor Sixth" 	C-Eb-G-A 				0-3-7-9
+C7 "Dominant Seventh" 	C-E-G-Bb 			0-4-7-10
+Cmaj7 "Major Seventh" 	C-E-G-B 			0-4-7-11
 Cm7 "Minor (Dominant) Seventh" 	C-Eb-G-Bb 	0-3-7-10
-Cdim7 "Diminished Seventh" 	C-Eb-Gb-A 	0-3-6-9
-C(add9) "Add 9" 	C-E-G-D 	0-4-7-14
-C9 "Ninth" 	C-E-G-Bb-D 	0-4-7-10-14
-Cmaj9 "Major Ninth" 	C-E-G-B-D 	0-4-7-11-14
-Cm9 "Minor Ninth" 	C-Eb-G-Bb-D 	0-3-7-10-14
-C11 "Eleventh" 	C-E-G-Bb-D-F 	0-4-7-10-14-17
-C13 "Thirteenth" 	C-E-G-Bb-D-A 	0-4-7-10-14-21 
+Cdim7 "Diminished Seventh" 	C-Eb-Gb-A 		0-3-6-9
+C(add9) "Add 9" 	C-E-G-D 				0-4-7-14
+C9 "Ninth" 	C-E-G-Bb-D 						0-4-7-10-14
+Cmaj9 "Major Ninth" 	C-E-G-B-D 			0-4-7-11-14
+Cm9 "Minor Ninth" 	C-Eb-G-Bb-D 			0-3-7-10-14
+C11 "Eleventh" 	C-E-G-Bb-D-F 				0-4-7-10-14-17
+C13 "Thirteenth" 	C-E-G-Bb-D-A 			0-4-7-10-14-21 
+
+				---> [0-3, 0-4, 0-5] seem to be the things to split into
 '''
 
 '''
@@ -213,4 +215,335 @@ C13 "Thirteenth" 	C-E-G-Bb-D-A 	0-4-7-10-14-21
 	While very rarely some may use steps of equal frequencies themselves
 '''
 
-any()  # use thiiiiis! :P
+# any()  # use thiiiiis! :P
+class MusicNotes:
+	#TODO: these need sorted if gonna be tuples so hashable...
+	chords = {
+		(0,4,7): 'C',
+		(0,3,7): 'Cm',
+		(0,3,6): 'Cdim',
+		(0,4,8): 'C+',
+		(0,5,7): 'Csus',
+		(0,4,7,9): 'C6',
+		(0,3,7,9): 'Cm6',
+		(0,4,7,10): 'C7',
+		(0,4,7,11): 'Cmaj7',
+		(0,3,7,10): 'Cm7',
+		(0,3,6,9): 'Cdim7',
+		(0,4,7,14): 'Cadd9',
+		(0,4,7,10,14): 'C9',
+		(0,4,7,11,14): 'Cmaj9',
+		(0,3,7,10,14): 'Cm9',
+		(0,4,7,10,14,17): 'C11',
+		(0,4,7,10,14,21): 'C13'
+	}
+
+	chord_desc = {
+		'C': 'Major Triad',
+		'Cm': 'Minor Triad',
+		'Cdim': 'Diminished',
+		'C+': 'Augmented',
+		'Csus': 'Sustained',
+		'C6': 'Sixth',
+		'Cm6': 'Minor Sixth',
+		'C7': 'Dominant Seventh',
+		'Cmaj7': 'Major Seventh',
+		'Cm7': 'Minor (Dominant)',
+		'Cdim7': 'Diminished Seventh',
+		'Cadd9': 'Add 9',
+		'C9': 'Ninth',
+		'Cmaj9': 'Major Ninth',
+		'Cm9': 'Minor Ninth',
+		'C11': 'Eleventh',
+		'C13': 'Thirteenth'
+	}
+
+
+
+	def _tones(notes):
+		'''
+			(G, C, E)  	-->  	(0, 5, 9)G 	--> 	*0-4-7-9  ?	[Seg('G6'), Seg('Gdim7')]
+			(C, E, G)	--> 	(0, 4, 7)C 	--> 				[Triad('C')]
+			(E, G, C) 	--> 	(0, 3, 8)E 	-- >	* 0-3-7-9 ? [Seg('e6')]
+
+			((((but can  you do this since diff keys for intervals are tech. diff. due to tuning?????))))
+
+			(C, F, A) 	--> 	(0, 5, 9)C <----- xC
+						--> 	(0, 4, 7)F <----- IF
+		'''
+
+
+def _permutations(notes):
+	perms = []
+	n = len(notes)
+	repeated_notes = notes * 3
+
+	for i in range(n):
+		perms.append(repeated_notes[i:i+n])
+	return perms
+
+def _permutations_in_key(notes):
+	# TODO: %24 instead of large, jazzy chords?
+	# these are ordrerd IFF _permutations are ordered
+
+	perms = _permutations(notes)
+	perms_in_key = []
+
+	for perm in perms:
+		intvs = []
+
+		for intv in perm:
+			intvs.append((intv - perm[0]) % 12)
+
+		perms_in_key.append(intvs)
+
+	return perms_in_key
+
+# TODO: do the above need key mods too then? i guess not since pure interval...
+
+
+
+	#### Or just make these into Enums :)
+	flat_keys = ['F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb']
+	sharp_keys = ['G', 'D', 'A', 'E', 'B', 'F#', 'C#']
+
+	minor_flat_keys = ['d', 'g', 'c', 'f', 'bb', 'eb', 'ab']
+	minor_sharp_keys = ['e', 'b', 'f#', 'c#', 'g#', 'd#', 'a#']
+
+	def _key_augment(key):
+		if key in (flat_keys, minor_flat_keys):
+			return 'flat'
+		elif key in (sharp_keys, minor_sharp_keys):
+			return 'sharp'
+		else:
+			return 'neutral'
+
+	def note(key, interval):
+		'''
+		'''
+
+class FlatKeys(IntEnum):
+	C = 0
+	F = 1
+	Bflat = 2
+	Eflat = 3
+	Aflat = 4
+	Dflat = 5
+	Gflat = 6
+	Cflat = 7
+	a = 0
+	d = 1
+	g = 2
+	c = 3
+	f = 4
+	bflat = 5
+	eflat = 6
+	aflat = 7
+class SharpKeys(IntEnum):
+	C = 0
+	G = 1
+	D = 2
+	A = 3
+	E = 4
+	B = 5
+	Fsharp = 6
+	Csharp = 7
+	a = 0
+	e = 1
+	b = 2
+	fsharp = 3
+	csharp = 4
+	gsharp = 5
+	dsharp = 6
+	asharp = 7
+
+
+class MajorFlatKeys(IntEnum):
+	C = 0
+	F = 1
+	Bflat = 2
+	Eflat = 3
+	Aflat = 4
+	Dflat = 5
+	Gflat = 6
+	Cflat = 7
+class MajorSharpKeys(IntEnum):
+	C = 0
+	G = 1
+	D = 2
+	A = 3
+	E = 4
+	B = 5
+	Fsharp = 6
+	Csharp = 7
+
+class MinorFlatKeys(IntEnum):
+	a = 0
+	d = 1
+	g = 2
+	c = 3
+	f = 4
+	bflat = 5
+	eflat = 6
+	aflat = 7
+class MinorSharpKeys(IntEnum):
+	a = 0
+	e = 1
+	b = 2
+	fsharp = 3
+	csharp = 4
+	gsharp = 5
+	dsharp = 6
+	asharp = 7
+
+
+### Why not just Key(___) with .numFlats, .numSharps, .notes, etc...?
+### Then can just do Keys(Enum).A for example to return Key(A) ??
+
+
+# class Key:
+# 	keys = ('C')
+
+# 	def __init__(self, key='C'):
+# 		if key not in cls.keys:
+# 			raise ValueException()
+
+# 		if key == 'C':
+# 			return KeyC
+
+
+
+class Key(ABC):
+
+	@abstractmethod
+	def __init__(self, key):
+		self.key = key
+
+	@abstractmethod
+	def notes(self):
+		pass
+
+class KeyCMajor(Key):
+	def __init__(self):
+		super().__init__('Cmajor')
+
+	def notes(self):
+		pass
+
+
+
+# 1)
+class Keys(Enum):
+	C = KeyCMajor()
+# 2)
+KEYS = {
+	'C': KeyCMajor()
+}
+# 3-4)
+class Keeys:
+	# 3) 
+	# TODO: ---if you do this, make sure peeps can't change this class with reference :) ---> return KeyCMajor and have them instantiate on declaration!
+	D = KeyCMajor()
+	# 4)
+	_C = KeyCMajor()
+	@property
+	def C(self):
+		return self._C
+	
+
+#def is_sharp(note, key):
+	#if note not stripped of mods, error
+#	"if key in MajorSharpKeys and val > 2...
+
+
+
+
+if __name__ == '__main__':
+	print(_permutations_in_key([0,4,7]))
+
+	# TODO: ERROR CHECKING HERE...
+	# k = Key()
+	# k = Key('k')
+	# a = Key.notes()
+
+	# k = Keys.C.value   # TODO: ...this is why we don't use Enums for instantiation.....
+	# print(k)
+	# print(dir(k))
+
+	# k = KEYS['C']   # TODO: ...this is why we don't use Enums for instantiation.....
+	# print(k)
+	# print(dir(k))
+
+	# print('\n\n')  # TODO: --'property object', not KeyCMajor object
+	# k = Keeys.C
+	# print(k)
+	# print(dir(k))
+
+	# print('\n\n')
+	# k = Keeys.D
+	# print(k)
+	# print(dir(k))
+
+	a = Keeys.D
+	b = Keeys.D
+	a.x = 1
+	print(a == b)
+	print(b.x)
+
+	# for k,v in intervals.items():
+	# 	print(k,v)
+	# ''' can't use dict as key for other dict....'''
+
+
+
+	# TODO: inifinite sequence generator of notes so that you can go through a scale?
+	# TODO: ...does that include C4, C5, etc.... ???? (technically infinite???....)
+	# TODO: enharmonic equivalents...
+
+	# TODO: establish Keys vs. Notes vs. Chords, and which can be Major/Minor/Sharp/Flat/Aug./Dim./etc.
+	# TODO: Major -> relative minor... through function? Can transform between?
+		# TODO: 'add-sharp' or 'add-flat' methods too if allowing transformations?
+	# TODO: Theoretical keys with ## or bb sigs?
+		# TODO: secondary dominants :3
+		# TODO: Tonic -I, Dom -V/-vii, PreDom -IV/-ii, Nothing -iii
+		'''
+			---key F -> Dom is C---
+			C-E-G:      V
+			D-F-*Ab: 	iio/V
+			*Eb-G-Bb: 	bIII/V
+			E-G-*B: 	iii/V
+			E-*G#-*B#: 	III+/V
+			F-*Ab-C: 	iv/V
+			G-*B-D: 	V/V
+			*Ab-C-*Eb: 	bVI/V
+			A-C-*Eb: 	vio/V
+			*B-D-F: 	viio/V
+			C-E-G: 		V
+
+			----Changes----
+			V - ()
+			iio/V - (bb --> bbbbb)
+			bIII/V - 1
+			iii/V - 1 (V/V)
+			III+/V - 4
+			iv/V - 2 (iio/V, bVI/V)
+			V/V - 1 (iii/V)
+			bVI/V - 2 (iio/V, iv/V)
+			vio/V - 1
+			viio/V - 1 (V/V, iii/V)
+
+			----Equivs----
+			ii/V = vi   ***
+			IV/V = I    ***
+			v/V = ii
+			vi/V = iii  ***
+			bVII/V = IV
+
+			----notes----
+			i76-5 ? -> iio/V
+		'''
+
+		# TODO: 
+		# TODO: 
+		# TODO: 
+		# TODO: 
